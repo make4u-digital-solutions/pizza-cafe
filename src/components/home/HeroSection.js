@@ -9,7 +9,9 @@ import { ArrowRight, Flame, ChefHat, Award, Star } from "lucide-react";
 export default function HeroSection() {
   const containerRef = useRef(null);
   const imageRef = useRef(null);
+  const pizzaSpinRef = useRef(null);
   const badgeRef = useRef(null);
+  const spinAnimationRef = useRef(null);
 
   useEffect(() => {
     // Respect reduced motion
@@ -17,7 +19,7 @@ export default function HeroSection() {
     if (prefersReducedMotion) return;
 
     const ctx = gsap.context(() => {
-      // Staggered text reveal with safe fromTo so it never stays stuck at 0 opacity
+      // 1. Staggered text reveal with safe fromTo so it never stays stuck at 0 opacity
       gsap.fromTo(
         ".hero-stagger",
         { y: 24, opacity: 0 },
@@ -31,7 +33,7 @@ export default function HeroSection() {
         }
       );
 
-      // Pizza image scale and reveal
+      // 2. Pizza image scale and reveal
       if (imageRef.current) {
         gsap.fromTo(
           imageRef.current,
@@ -43,11 +45,41 @@ export default function HeroSection() {
             ease: "power2.out",
             delay: 0.15,
             clearProps: "transform",
+            onComplete: () => {
+              // Subtle orbital float after entrance
+              gsap.to(imageRef.current, {
+                y: 8,
+                duration: 3,
+                repeat: -1,
+                yoyo: true,
+                ease: "sine.inOut",
+              });
+            },
           }
         );
       }
 
-      // Badge entrance
+      // 3. Continuous smooth circular rotation on the pizza disc
+      if (pizzaSpinRef.current) {
+        spinAnimationRef.current = gsap.to(pizzaSpinRef.current, {
+          rotation: 360,
+          duration: 38,
+          repeat: -1,
+          ease: "none",
+          transformOrigin: "50% 50%",
+        });
+      }
+
+      // 4. Outer dashed ring slow counter-rotation
+      gsap.to(".outer-dashed-ring", {
+        rotation: -360,
+        duration: 55,
+        repeat: -1,
+        ease: "none",
+        transformOrigin: "50% 50%",
+      });
+
+      // 5. Badge entrance
       if (badgeRef.current) {
         gsap.fromTo(
           badgeRef.current,
@@ -66,6 +98,18 @@ export default function HeroSection() {
 
     return () => ctx.revert();
   }, []);
+
+  const handleMouseEnter = () => {
+    if (spinAnimationRef.current) {
+      gsap.to(spinAnimationRef.current, { timeScale: 0.25, duration: 0.6 });
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (spinAnimationRef.current) {
+      gsap.to(spinAnimationRef.current, { timeScale: 1, duration: 0.6 });
+    }
+  };
 
   return (
     <section
@@ -151,30 +195,40 @@ export default function HeroSection() {
             </div>
           </div>
 
-          {/* Right Column: Hero Pizza Showcase Composition */}
-          <div className="lg:col-span-5 relative flex items-center justify-center">
-            {/* Outer decorative dashed ring */}
-            <div className="absolute w-[320px] h-[320px] sm:w-[420px] sm:h-[420px] rounded-full border border-dashed border-[#C83224]/30 pointer-events-none" />
+          {/* Right Column: Hero Pizza Showcase Composition with Circular Movement */}
+          <div
+            className="lg:col-span-5 relative flex items-center justify-center cursor-pointer group"
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
+            {/* Outer decorative dashed ring with gentle counter-rotation */}
+            <div className="outer-dashed-ring absolute w-[330px] h-[330px] sm:w-[430px] sm:h-[430px] rounded-full border-2 border-dashed border-[#C83224]/30 pointer-events-none" />
 
-            {/* Main Pizza Image */}
+            {/* Main Pizza Image Wrapper with subtle float */}
             <div
               ref={imageRef}
-              className="relative w-72 h-72 sm:w-96 sm:h-96 xl:w-[440px] xl:h-[440px] rounded-full overflow-hidden shadow-2xl border-4 border-white bg-[#E8D5B8]"
+              className="relative w-72 h-72 sm:w-96 sm:h-96 xl:w-[440px] xl:h-[440px] rounded-full overflow-hidden shadow-2xl border-4 border-white bg-[#E8D5B8] transition-shadow duration-500 group-hover:shadow-[0_25px_50px_-12px_rgba(200,50,36,0.3)]"
             >
-              <Image
-                src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1000&q=85"
-                alt="Artisan Stone-Baked Pizza at FORNO"
-                fill
-                priority
-                className="object-cover transition-transform duration-700 hover:scale-105"
-                sizes="(max-width: 640px) 280px, (max-width: 1024px) 380px, 440px"
-              />
+              {/* Rotating inner container containing the pizza */}
+              <div
+                ref={pizzaSpinRef}
+                className="relative w-full h-full will-change-transform"
+              >
+                <Image
+                  src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1000&q=85"
+                  alt="Artisan Stone-Baked Pizza at FORNO - Rotating Showcase"
+                  fill
+                  priority
+                  className="object-cover scale-105"
+                  sizes="(max-width: 640px) 280px, (max-width: 1024px) 380px, 440px"
+                />
+              </div>
             </div>
 
-            {/* Bestseller Floating Badge */}
+            {/* Bestseller Floating Badge (Stays stable and readable) */}
             <div
               ref={badgeRef}
-              className="absolute -top-3 -right-2 sm:top-4 sm:right-0 bg-white text-[#24201E] p-3 sm:p-4 rounded-2xl shadow-xl border border-[#E9DFD2] flex items-center gap-3 backdrop-blur-xs z-20"
+              className="absolute -top-3 -right-2 sm:top-4 sm:right-0 bg-white text-[#24201E] p-3 sm:p-4 rounded-2xl shadow-xl border border-[#E9DFD2] flex items-center gap-3 backdrop-blur-xs z-20 transition-transform duration-300 hover:scale-105"
             >
               <div className="w-10 h-10 rounded-full bg-[#C83224] text-white flex items-center justify-center font-bold shrink-0">
                 <Award className="w-5 h-5 text-white" />
@@ -193,8 +247,8 @@ export default function HeroSection() {
               </div>
             </div>
 
-            {/* Oven Temperature Tag */}
-            <div className="absolute -bottom-4 -left-2 sm:bottom-4 sm:left-0 bg-[#24201E] text-white py-2.5 px-4 rounded-2xl shadow-xl flex items-center gap-2.5 z-20">
+            {/* Oven Temperature Tag (Stays stable and readable) */}
+            <div className="absolute -bottom-4 -left-2 sm:bottom-4 sm:left-0 bg-[#24201E] text-white py-2.5 px-4 rounded-2xl shadow-xl flex items-center gap-2.5 z-20 transition-transform duration-300 hover:scale-105">
               <span className="p-1 rounded-full bg-[#C83224] text-white">
                 <Flame className="w-4 h-4 fill-current" />
               </span>
