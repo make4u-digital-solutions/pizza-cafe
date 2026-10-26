@@ -1,26 +1,78 @@
 @import "tailwindcss";
 
+@theme {
+  --color-primary: #C83224;
+  --color-primary-dark: #9F251C;
+  --color-cream: #FFF7EA;
+  --color-charcoal: #24201E;
+  --color-muted: #746B63;
+  --color-beige: #E8D5B8;
+  --color-green: #4D6B42;
+  --color-border: #E9DFD2;
+
+  --font-serif: var(--font-dm-serif), "DM Serif Display", Georgia, serif;
+  --font-sans: var(--font-jakarta), "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary: #C83224;
+  --primary-dark: #9F251C;
+  --cream: #FFF7EA;
+  --surface: #FFFFFF;
+  --charcoal: #24201E;
+  --muted: #746B63;
+  --beige: #E8D5B8;
+  --green: #4D6B42;
+  --border: #E9DFD2;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
+  background-color: #FFF7EA;
+  color: #24201E;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #FFF7EA;
+  color: #24201E;
+  font-family: var(--font-jakarta), system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, .font-serif {
+  font-family: var(--font-dm-serif), Georgia, serif;
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #FFF7EA;
+}
+::-webkit-scrollbar-thumb {
+  background: #E8D5B8;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #C83224;
+}
+
+/* Texture overlays and decorative patterns */
+.pattern-dots {
+  background-image: radial-gradient(rgba(36, 32, 30, 0.07) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.glow-red {
+  box-shadow: 0 10px 30px -10px rgba(200, 50, 36, 0.35);
+}
+
+.card-hover {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px -8px rgba(36, 32, 30, 0.08);
 }
